@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title desc">
+  <title id="title">星港学院地图</title>
+  <desc id="desc">包含观测塔、工坊、温室、旧码头和宿舍的简化地图。</desc>
+  <rect width="1200" height="750" fill="#dfeee7"/>
+  <path d="M0 560 C190 520 260 585 410 548 C570 509 690 540 820 508 C990 466 1080 500 1200 452 L1200 750 L0 750 Z" fill="#88a979"/>
+  <path d="M0 640 C180 600 310 650 500 615 C710 575 850 625 1200 560 L1200 750 L0 750 Z" fill="#5f8f86"/>
+  <path d="M0 180 C150 140 290 170 430 130 C610 80 770 128 920 90 C1050 56 1120 74 1200 42 L1200 0 L0 0 Z" fill="#b8d5df"/>
+  <path d="M85 591 C230 560 370 580 540 552 C704 525 800 545 958 505" fill="none" stroke="#f5ead3" stroke-width="32" stroke-linecap="round"/>
+  <path d="M245 242 L420 180 L610 255 L730 220 L930 310" fill="none" stroke="#f5ead3" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(218 128)">
+    <rect x="0" y="118" width="138" height="115" rx="8" fill="#f7f1df" stroke="#74634c" stroke-width="6"/>
+    <path d="M34 118 L69 20 L104 118 Z" fill="#c75a45" stroke="#74634c" stroke-width="6"/>
+    <rect x="55" y="145" width="28" height="88" fill="#74634c"/>
+    <text x="69" y="278" text-anchor="middle" font-size="34" font-family="sans-serif" fill="#26332d">观测塔</text>
+  </g>
+  <g transform="translate(515 235)">
+    <rect x="0" y="55" width="175" height="120" rx="8" fill="#efe1c4" stroke="#74634c" stroke-width="6"/>
+    <path d="M0 58 L88 0 L175 58 Z" fill="#566f82" stroke="#74634c" stroke-width="6"/>
+    <rect x="116" y="86" width="38" height="34" fill="#b77a18"/>
+    <text x="88" y="220" text-anchor="middle" font-size="34" font-family="sans-serif" fill="#26332d">旧工坊</text>
+  </g>
+  <g transform="translate(740 150)">
+    <path d="M10 115 Q85 0 160 115 Z" fill="#d8f0d3" stroke="#557a3d" stroke-width="6"/>
+    <rect x="10" y="112" width="150" height="78" rx="8" fill="#f7f1df" stroke="#557a3d" stroke-width="6"/>
+    <path d="M45 166 C54 135 82 132 89 96 C102 130 132 132 135 166" fill="none" stroke="#557a3d" stroke-width="7" stroke-linecap="round"/>
+    <text x="85" y="235" text-anchor="middle" font-size="34" font-family="sans-serif" fill="#26332d">温室</text>
+  </g>
+  <g transform="translate(840 493)">
+    <rect x="0" y="18" width="250" height="28" rx="8" fill="#6f5a42"/>
+    <rect x="30" y="46" width="18" height="96" fill="#6f5a42"/>
+    <rect x="190" y="46" width="18" height="96" fill="#6f5a42"/>
+    <path d="M-20 142 C45 110 105 156 165 128 C224 100 270 134 320 112 L320 190 L-20 190 Z" fill="#7fb4b2"/>
+    <text x="125" y="0" text-anchor="middle" font-size="34" font-family="sans-serif" fill="#26332d">旧码头</text>
+  </g>
+  <g transform="translate(145 430)">
+    <rect x="0" y="66" width="178" height="125" rx="8" fill="#f8f4ea" stroke="#74634c" stroke-width="6"/>
+    <path d="M-14 70 L89 0 L192 70 Z" fill="#557a3d" stroke="#74634c" stroke-width="6"/>
+    <rect x="32" y="98" width="38" height="34" fill="#b8d5df"/>
+    <rect x="108" y="98" width="38" height="34" fill="#b8d5df"/>
+    <text x="89" y="238" text-anchor="middle" font-size="34" font-family="sans-serif" fill="#26332d">宿舍</text>
+  </g>
+  <circle cx="605" cy="558" r="13" fill="#c75a45"/>
+  <circle cx="420" cy="184" r="10" fill="#177c78"/>
+  <circle cx="928" cy="309" r="10" fill="#177c78"/>
+</svg>

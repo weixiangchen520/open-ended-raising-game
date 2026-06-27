@@ -1,0 +1,15 @@
+logs/*.jsonl
+logs/*.log
+*.local
+.env
+.env.*
+!.env.example
+config/*.local.json
+data/
+screenshots/
+node_modules/
+dist/
+.vite/
+.git/
+.chrome-profile*/
+.edge-profile*/

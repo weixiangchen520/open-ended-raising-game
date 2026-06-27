@@ -1,0 +1,43 @@
+{
+  "name": "open-ended-raising-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "check": "node --check auth.js && node --check server.js && node --check scripts/verify-director.mjs && node --check scripts/capture-hidden-goal-screenshot.mjs && node --check scripts/hash-password.mjs && npm test && npm run build",
+    "deploy:ecs": "powershell -ExecutionPolicy Bypass -File scripts/deploy-ecs.ps1",
+    "screenshot:continuity": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='continuity'; $env:SCREENSHOT_REQUIRED_TEXT='连续性|羁绊事件|检索|连接'; $env:SCREENSHOT_PATH='screenshots/continuity-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:memory": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='memory'; $env:SCREENSHOT_REQUIRED_TEXT='记忆|社交|温室|林鸢|关联记忆'; $env:SCREENSHOT_PATH='screenshots/memory-tags-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:memory-topics": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='memory-topics'; $env:SCREENSHOT_REQUIRED_TEXT='记忆主题|证据|强度|新鲜度|可引用'; $env:SCREENSHOT_PATH='screenshots/memory-topics-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:skills": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='skills'; $env:SCREENSHOT_REQUIRED_TEXT='能力库|等级|进度|星图判读'; $env:SCREENSHOT_PATH='screenshots/skills-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:world-facts": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='world-facts'; $env:SCREENSHOT_REQUIRED_TEXT='世界发现|置信度|观察到|旧码头'; $env:SCREENSHOT_PATH='screenshots/world-facts-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:journal": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='bond-quests'; $env:SCREENSHOT_REQUIRED_TEXT='羁绊任务|全部|紧张|进行中|完成|林鸢|追问牵挂'; $env:SCREENSHOT_PATH='screenshots/bond-quests-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:context": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='context-preview'; $env:SCREENSHOT_REQUIRED_TEXT='行动依据|导演层会优先带入的上下文|计划|记忆|洞察|目标'; $env:SCREENSHOT_PATH='screenshots/action-context-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:opportunities": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='opportunities'; $env:SCREENSHOT_REQUIRED_TEXT='行动机会|优先级|确认发现|发现'; $env:SCREENSHOT_PATH='screenshots/opportunities-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:diagnostics": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='diagnostics'; $env:SCREENSHOT_REQUIRED_TEXT='体验诊断|连续性|行动多样性|开放循环|健康分'; $env:SCREENSHOT_PATH='screenshots/diagnostics-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:commitments": "powershell -NoProfile -Command \"$env:SCREENSHOT_CREATE_COMMITMENT='1'; $env:SCREENSHOT_SECTION_ID='commitments'; $env:SCREENSHOT_REQUIRED_TEXT='承诺|待兑现|兑现|继续确认|期限'; $env:SCREENSHOT_PATH='screenshots/commitments-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:quest": "powershell -NoProfile -Command \"$env:SCREENSHOT_FOLLOW_QUEST_STEPS='3'; $env:SCREENSHOT_REQUIRED_TEXT='羁绊完成|结算|沉淀羁绊'; $env:SCREENSHOT_PATH='screenshots/quest-complete-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:pressure": "powershell -NoProfile -Command \"$env:SCREENSHOT_PRESSURE_QUEST='1'; $env:SCREENSHOT_REQUIRED_TEXT='羁绊紧张|修复羁绊|压力'; $env:SCREENSHOT_PATH='screenshots/quest-pressure-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:repair": "powershell -NoProfile -Command \"$env:SCREENSHOT_PRESSURE_QUEST='1'; $env:SCREENSHOT_REPAIR_QUEST='1'; $env:SCREENSHOT_REQUIRED_TEXT='羁绊任务|压力 37%|追问牵挂'; $env:SCREENSHOT_PATH='screenshots/quest-repair-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "screenshot:npc": "node scripts/capture-hidden-goal-screenshot.mjs",
+    "screenshot:chapters": "powershell -NoProfile -Command \"$env:SCREENSHOT_SECTION_ID='chapters'; $env:SCREENSHOT_REQUIRED_TEXT='篇章|进度|压力|下一步'; $env:SCREENSHOT_PATH='screenshots/chapters-mobile-cdp.png'; node scripts/capture-hidden-goal-screenshot.mjs\"",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
+    "autoprefixer": "^10.5.2",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.17",
+    "vite": "^8.1.0"
+  }
+}

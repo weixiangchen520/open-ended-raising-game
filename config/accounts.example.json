@@ -1,0 +1,11 @@
+{
+  "accounts": [
+    {
+      "id": "test",
+      "login": "test",
+      "displayName": "Test Account",
+      "role": "tester",
+      "passwordHash": "pbkdf2:sha256:120000:replace-with-salt:replace-with-hash"
+    }
+  ]
+}
