@@ -29,11 +29,19 @@ Node 服务默认地址：
 http://localhost:4177
 ```
 
-如果需要使用真实 LLM，启动 Node 服务前设置：
+如果需要使用真实 LLM，可以把配置写入本地 `.env`。`npm start` 会自动读取 `.env`，并且不会覆盖你在当前终端里临时设置的环境变量：
+
+```dotenv
+PORT=4177
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_API_KEY=你的 key
+OPENAI_MODEL=gpt-5.5
+```
+
+也可以在启动前临时覆盖：
 
 ```powershell
-$env:OPENAI_API_KEY="你的 key"
-$env:OPENAI_MODEL="gpt-5.5"
+$env:OPENAI_MODEL="另一个模型"
 npm start
 ```
 

@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { constants as fsConstants } from "node:fs";
+import { constants as fsConstants, existsSync, readFileSync } from "node:fs";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, isAbsolute, relative as pathRelative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +25,7 @@ import { buildActionOpportunities, buildExperienceDiagnostics, createLocalOutcom
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const distDir = resolve(__dirname, "dist");
 const publicDir = resolve(__dirname, "public");
+loadDotEnv(resolve(__dirname, ".env"));
 const port = Number(process.env.PORT || 4177);
 const llmTimeoutMs = Number(process.env.OPENAI_TIMEOUT_MS || 28000);
 const accountFile = process.env.STARHARBOR_ACCOUNTS_FILE ||
@@ -546,6 +547,28 @@ function minimalOutcomeShape() {
 
 function normalizeBaseUrl(url) {
   return String(url || "").replace(/\/+$/, "");
+}
+
+function loadDotEnv(filePath) {
+  if (!existsSync(filePath)) return;
+  const lines = readFileSync(filePath, "utf8").split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!match) continue;
+    const [, key, rawValue] = match;
+    if (process.env[key] !== undefined) continue;
+    process.env[key] = unquoteEnvValue(rawValue);
+  }
+}
+
+function unquoteEnvValue(value) {
+  const trimmed = String(value || "").trim();
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
 }
 
 function shouldRetryWithoutResponseFormat(status, bodyText) {
