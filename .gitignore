@@ -1,5 +1,7 @@
 logs/*.jsonl
 logs/*.log
+*.tgz
+artifacts/
 *.local
 .env
 .env.*
