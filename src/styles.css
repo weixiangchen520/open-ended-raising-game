@@ -7,8 +7,14 @@
     scroll-behavior: smooth;
   }
 
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
   body {
-    @apply m-0 min-h-screen min-w-[320px] overflow-x-hidden bg-star-bg font-sans text-white;
+    @apply m-0 min-h-screen min-w-[320px] overflow-hidden bg-star-bg font-sans text-white;
     background:
       radial-gradient(circle at 12% 16%, rgb(255 255 255 / 75%) 0 1px, transparent 1.5px),
       radial-gradient(circle at 82% 24%, rgb(255 255 255 / 65%) 0 1px, transparent 1.5px),
@@ -58,12 +64,22 @@
 
 @layer components {
   .app-shell {
-    @apply mx-auto min-h-screen w-full max-w-[590px] px-6 pb-28;
+    @apply mx-auto flex h-[100dvh] w-full max-w-[590px] flex-col overflow-hidden px-6;
   }
 
   .topbar {
-    @apply sticky top-0 z-20 -mx-6 grid min-h-[70px] grid-cols-[1fr_auto_1fr] items-center bg-[#805cf4] px-6 py-2.5 shadow-card;
+    @apply sticky top-0 z-20 -mx-6 grid min-h-[70px] shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#805cf4] px-6 py-2.5 shadow-card;
     animation: top-drop 420ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .app-content {
+    @apply min-h-0 flex-1 space-y-3.5 overflow-y-auto overscroll-contain pb-28 pt-3;
+    scrollbar-width: none;
+  }
+
+  .app-content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   .phone-time {
@@ -1072,16 +1088,116 @@
     @apply fixed bottom-3.5 left-1/2 z-30 grid w-[min(542px,calc(100vw-24px))] -translate-x-1/2 grid-cols-5 gap-1 rounded-3xl border border-violet-200/15 bg-[#181236]/85 px-2 py-2.5 shadow-card backdrop-blur-xl;
   }
 
-  .bottom-nav a {
-    @apply grid min-w-0 justify-items-center gap-1 text-xs font-black text-star-muted no-underline transition hover:text-violet-200;
+  .bottom-nav button {
+    @apply grid min-h-[58px] min-w-0 justify-items-center gap-1 rounded-2xl border border-transparent bg-transparent px-1 py-1 text-xs font-black text-star-muted transition hover:border-violet-200/15 hover:bg-white/5 hover:text-violet-100;
   }
 
-  .bottom-nav a.is-active {
-    @apply text-violet-300;
+  .bottom-nav button.is-active {
+    @apply border-violet-200/25 bg-violet-300/10 text-violet-100 shadow-[0_0_18px_rgb(143_99_255_/_0.18)];
   }
 
-  .bottom-nav span {
-    @apply h-5.5 w-5.5 rounded-lg border-2 border-current;
+  .nav-label {
+    @apply block max-w-full truncate leading-none;
+  }
+
+  .nav-icon {
+    @apply relative h-5.5 w-5.5 text-current;
+  }
+
+  .nav-icon::before,
+  .nav-icon::after {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    border-color: currentColor;
+  }
+
+  .nav-icon-home::before {
+    left: 4px;
+    top: 8px;
+    width: 14px;
+    height: 11px;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+  }
+
+  .nav-icon-home::after {
+    left: 5px;
+    top: 3px;
+    width: 12px;
+    height: 12px;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .nav-icon-action::before {
+    inset: 3px;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .nav-icon-action::after {
+    left: 10px;
+    top: 6px;
+    width: 2px;
+    height: 10px;
+    border-left: 2px solid currentColor;
+    box-shadow: -4px 4px 0 -1px currentColor, 4px 4px 0 -1px currentColor;
+  }
+
+  .nav-icon-bond::before {
+    left: 3px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .nav-icon-bond::after {
+    right: 3px;
+    top: 9px;
+    width: 12px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .nav-icon-memory::before {
+    left: 4px;
+    top: 4px;
+    width: 14px;
+    height: 15px;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+  }
+
+  .nav-icon-memory::after {
+    left: 8px;
+    top: 9px;
+    width: 8px;
+    height: 7px;
+    border-top: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+  }
+
+  .nav-icon-me::before {
+    left: 7px;
+    top: 3px;
+    width: 9px;
+    height: 9px;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .nav-icon-me::after {
+    left: 4px;
+    top: 14px;
+    width: 14px;
+    height: 7px;
+    border: 2px solid currentColor;
+    border-radius: 999px 999px 3px 3px;
   }
 }
 

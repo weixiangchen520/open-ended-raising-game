@@ -157,13 +157,15 @@ try {
       expression: `(async () => {
         const sectionId = ${JSON.stringify(sectionId)};
         const requiredTexts = ${JSON.stringify(requiredTexts)};
+        location.hash = sectionId;
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const section = document.querySelector('#' + sectionId);
         if (section) {
-          location.hash = sectionId;
-          const top = section.getBoundingClientRect().top + window.pageYOffset - 76;
-          window.scrollTo(0, top);
-          document.documentElement.scrollTop = top;
-          document.body.scrollTop = top;
+          section.scrollIntoView({ block: 'start' });
+          const appContent = document.querySelector('.app-content');
+          if (appContent && appContent.contains(section)) {
+            appContent.scrollTop = Math.max(0, section.offsetTop - appContent.offsetTop - 12);
+          }
           await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         }
         const text = section?.innerText || '';

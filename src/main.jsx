@@ -39,9 +39,64 @@ const toneColors = {
   green: "#79e09f"
 };
 
+const APP_TABS = [
+  { id: "home", label: "首页", hash: "plans", icon: "home" },
+  { id: "action", label: "行动", hash: "actions", icon: "action" },
+  { id: "bond", label: "羁绊", hash: "bond-quests", icon: "bond" },
+  { id: "memory", label: "记忆", hash: "memory", icon: "memory" },
+  { id: "me", label: "我的", hash: "profile", icon: "me" }
+];
+
+const SECTION_TAB_MAP = {
+  plans: "home",
+  opportunities: "home",
+  diagnostics: "home",
+  chapters: "home",
+  actions: "action",
+  map: "action",
+  outcome: "action",
+  event: "action",
+  "context-preview": "action",
+  "bond-quests": "bond",
+  npcs: "bond",
+  commitments: "bond",
+  continuity: "memory",
+  reflection: "memory",
+  reflections: "memory",
+  "world-facts": "memory",
+  "memory-topics": "memory",
+  memory: "memory",
+  profile: "me",
+  stats: "me",
+  skills: "me",
+  goals: "me",
+  diary: "me"
+};
+
+function hashIdFromLocation() {
+  return String(window.location.hash || "").replace(/^#/, "").trim();
+}
+
+function tabIdFromHash(hash) {
+  const hashId = String(hash || "").replace(/^#/, "").trim();
+  const directTab = APP_TABS.find((tab) => tab.id === hashId || tab.hash === hashId);
+  return directTab?.id || SECTION_TAB_MAP[hashId] || "home";
+}
+
+function hashForTab(tabId) {
+  return APP_TABS.find((tab) => tab.id === tabId)?.hash || APP_TABS[0].hash;
+}
+
+function replaceHashForTab(tabId) {
+  const hash = hashForTab(tabId);
+  if (window.location.hash === `#${hash}`) return;
+  window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${hash}`);
+}
+
 function App() {
   const [auth, setAuth] = useState({ status: "checking", user: null, message: "" });
   const [state, setState] = useState(createInitial);
+  const [activeTab, setActiveTab] = useState(() => tabIdFromHash(window.location.hash));
   const [selection, setSelection] = useState(() => ({
     locationId: state.currentLocationId || "observatory",
     npcId: "",
@@ -57,10 +112,27 @@ function App() {
   });
   const [busy, setBusy] = useState(false);
   const importInputRef = useRef(null);
+  const appContentRef = useRef(null);
+  const pendingSectionRef = useRef(hashIdFromLocation());
 
   useEffect(() => {
     restoreSession();
   }, []);
+
+  useEffect(() => {
+    function handleHashChange() {
+      pendingSectionRef.current = hashIdFromLocation();
+      setActiveTab(tabIdFromHash(window.location.hash));
+    }
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  useEffect(() => {
+    scrollActiveTabContent(pendingSectionRef.current || hashForTab(activeTab), "auto");
+    pendingSectionRef.current = "";
+  }, [activeTab]);
 
   useEffect(() => {
     if (auth.status !== "authenticated") return;
@@ -178,6 +250,30 @@ function App() {
     if (eventName) clientLog(eventName, details);
   }
 
+  function selectTab(tabId, sourceEvent = "ui.tab_selected") {
+    const nextTab = APP_TABS.some((tab) => tab.id === tabId) ? tabId : "home";
+    setActiveTab(nextTab);
+    replaceHashForTab(nextTab);
+    pendingSectionRef.current = hashForTab(nextTab);
+    scrollActiveTabContent(hashForTab(nextTab), "smooth");
+    if (sourceEvent) clientLog(sourceEvent, { tabId: nextTab });
+  }
+
+  function scrollActiveTabContent(sectionId, behavior = "smooth") {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const container = appContentRef.current;
+        if (!container) return;
+        const target = sectionId ? document.getElementById(sectionId) : null;
+        if (target && container.contains(target)) {
+          target.scrollIntoView({ behavior, block: "start" });
+          return;
+        }
+        container.scrollTo({ top: 0, behavior });
+      });
+    });
+  }
+
   function exportSave() {
     const blob = new Blob([serializeGame(state)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -229,9 +325,9 @@ function App() {
     if (!nextText) return;
     setSelection((current) => ({ ...current, ...patch, customText: nextText }));
     setMeta((current) => ({ ...current, status: "已填入下一次自由行动，可以直接执行或继续修改。" }));
-    requestAnimationFrame(() => {
-      document.querySelector("#actions")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    selectTab("action", "");
+    pendingSectionRef.current = "actions";
+    scrollActiveTabContent("actions", "smooth");
     clientLog(source, { ...details, textLength: nextText.length });
   }
 
@@ -288,13 +384,101 @@ function App() {
   const actionOpportunities = buildActionOpportunities(state);
   const experienceDiagnostics = buildExperienceDiagnostics(state);
 
-  return (
-    <div className="app-shell">
-      <TopBar provider={meta.provider} user={auth.user} onLogout={logout} />
-      <ProfilePanel state={state} />
-      <TimeTrack slot={state.slot} />
+  function renderActiveTab() {
+    if (activeTab === "action") {
+      return (
+        <>
+          <TimeTrack slot={state.slot} />
+          <MapPanel state={state} selection={selection} onSelect={updateSelection} />
+          <ActionsPanel
+            state={state}
+            selection={selection}
+            meta={meta}
+            context={actionContext}
+            busy={busy}
+            onSelect={updateSelection}
+            onPerform={performAction}
+          />
+          <OutcomePanel
+            meta={meta}
+            onChoose={chooseOutcome}
+          />
+        </>
+      );
+    }
 
-      <main className="space-y-3.5">
+    if (activeTab === "bond") {
+      return (
+        <>
+          <BondQuestsPanel
+            state={state}
+            onUseQuestLine={(quest) => useQuestSeed(quest, "ui.quest_journal_used")}
+          />
+          <NpcsPanel
+            state={state}
+            selection={selection}
+            onSelect={updateSelection}
+            onUseQuestLine={(quest) => useQuestSeed(quest, "ui.npc_quest_used")}
+            onUseBondEvent={(event, npc) => {
+              const followUp = event.followUp || {};
+              usePromptSeed(
+                followUp.intent || event.text,
+                "ui.bond_follow_up_used",
+                { bondEventId: event.id, npcId: npc.id, type: event.type },
+                {
+                  presetId: followUp.actionType || "social",
+                  locationId: followUp.locationId || state.currentLocationId,
+                  npcId: followUp.npcId || npc.id
+                }
+              );
+            }}
+          />
+          <CommitmentsPanel commitments={state.commitments || []} onUse={useCommitment} />
+        </>
+      );
+    }
+
+    if (activeTab === "memory") {
+      return (
+        <>
+          <ContinuityPanel traces={state.continuityTraces || []} />
+          <ReflectionPanel
+            reflections={state.reflections || []}
+            onUse={(reflection) =>
+              usePromptSeed(
+                `围绕「${reflection.focus || "洞察"}」继续行动：${reflection.title}`,
+                "ui.reflection_used",
+                { reflectionId: reflection.id, day: reflection.day }
+              )
+            }
+          />
+          <WorldFactsPanel facts={state.worldFacts || []} />
+          <MemoryTopicsPanel topics={state.memoryTopics || []} />
+          <MemoryPanel memories={state.memories} />
+        </>
+      );
+    }
+
+    if (activeTab === "me") {
+      return (
+        <>
+          <ProfilePanel state={state} />
+          <StatsPanel state={state} statDeltas={meta.statDeltas || {}} />
+          <SkillsPanel skills={state.hero.skills || []} />
+          <GoalsPanel goals={state.hero.goals} />
+          <DiaryPanel
+            diary={state.diary}
+            onExport={exportSave}
+            onImport={() => importInputRef.current?.click()}
+            onReset={resetSave}
+          />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <TimeTrack slot={state.slot} />
         <PlansPanel
           plans={state.plans || []}
           onUse={(plan) =>
@@ -327,71 +511,19 @@ function App() {
         />
         <DiagnosticsPanel diagnostics={experienceDiagnostics} />
         <ChaptersPanel chapters={state.chapters || []} onUse={useChapter} />
-        <BondQuestsPanel
-          state={state}
-          onUseQuestLine={(quest) => useQuestSeed(quest, "ui.quest_journal_used")}
-        />
-        <StatsPanel state={state} statDeltas={meta.statDeltas || {}} />
-        <SkillsPanel skills={state.hero.skills || []} />
-        <MapPanel state={state} selection={selection} onSelect={updateSelection} />
-        <ActionsPanel
-          state={state}
-          selection={selection}
-          meta={meta}
-          context={actionContext}
-          busy={busy}
-          onSelect={updateSelection}
-          onPerform={performAction}
-        />
-        <OutcomePanel
-          meta={meta}
-          onChoose={chooseOutcome}
-        />
-        <CommitmentsPanel commitments={state.commitments || []} onUse={useCommitment} />
-        <ContinuityPanel traces={state.continuityTraces || []} />
-        <ReflectionPanel
-          reflections={state.reflections || []}
-          onUse={(reflection) =>
-            usePromptSeed(
-              `围绕「${reflection.focus || "洞察"}」继续行动：${reflection.title}`,
-              "ui.reflection_used",
-              { reflectionId: reflection.id, day: reflection.day }
-            )
-          }
-        />
-        <NpcsPanel
-          state={state}
-          selection={selection}
-          onSelect={updateSelection}
-          onUseQuestLine={(quest) => useQuestSeed(quest, "ui.npc_quest_used")}
-          onUseBondEvent={(event, npc) => {
-            const followUp = event.followUp || {};
-            usePromptSeed(
-              followUp.intent || event.text,
-              "ui.bond_follow_up_used",
-              { bondEventId: event.id, npcId: npc.id, type: event.type },
-              {
-                presetId: followUp.actionType || "social",
-                locationId: followUp.locationId || state.currentLocationId,
-                npcId: followUp.npcId || npc.id
-              }
-            );
-          }}
-        />
-        <GoalsPanel goals={state.hero.goals} />
-        <DiaryPanel
-          diary={state.diary}
-          onExport={exportSave}
-          onImport={() => importInputRef.current?.click()}
-          onReset={resetSave}
-        />
-        <WorldFactsPanel facts={state.worldFacts || []} />
-        <MemoryTopicsPanel topics={state.memoryTopics || []} />
-        <MemoryPanel memories={state.memories} />
+      </>
+    );
+  }
+
+  return (
+    <div className="app-shell">
+      <TopBar provider={meta.provider} user={auth.user} onLogout={logout} />
+      <main ref={appContentRef} className="app-content" aria-live="polite">
+        {renderActiveTab()}
       </main>
 
       <input ref={importInputRef} onChange={importSave} type="file" accept="application/json" hidden />
-      <BottomNav />
+      <BottomNav activeTab={activeTab} onSelect={selectTab} />
     </div>
   );
 }
@@ -1807,20 +1939,20 @@ function ChoiceButton({ selected, title, copy, onClick }) {
   );
 }
 
-function BottomNav() {
+function BottomNav({ activeTab, onSelect }) {
   return (
-    <nav className="bottom-nav" aria-label="主导航">
-      {[
-        ["#profile", "首页"],
-        ["#opportunities", "机会"],
-        ["#actions", "行动"],
-        ["#bond-quests", "羁绊"],
-        ["#memory", "我的"]
-      ].map(([href, label], index) => (
-        <a key={href} href={href} className={index === 4 ? "is-active" : ""}>
-          <span aria-hidden="true" />
-          {label}
-        </a>
+    <nav className="bottom-nav" aria-label="Main navigation">
+      {APP_TABS.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          className={activeTab === tab.id ? "is-active" : ""}
+          aria-current={activeTab === tab.id ? "page" : undefined}
+          onClick={() => onSelect(tab.id)}
+        >
+          <span className={`nav-icon nav-icon-${tab.icon}`} aria-hidden="true" />
+          <span className="nav-label">{tab.label}</span>
+        </button>
       ))}
     </nav>
   );
